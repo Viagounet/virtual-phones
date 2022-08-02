@@ -6,16 +6,17 @@ from phone import PhoneColorPalette, Phone
 
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-phones = [Phone("blue", height="80vh", number="+1 719 212 2797", id=0),
-          Phone("green", height="80vh", id=1),
-          Phone("pink", height="80vh", id=2),
-          Phone("white", height="80vh", id=3)]
+phones = [Phone("blue", height="65vh", number="+1 719 212 2797", id=0),
+          Phone("green", height="65vh", id=1),
+          Phone("pink", height="65vh", id=2),
+          Phone("white", height="65vh", id=3)]
 
 app.layout = dbc.Container(
-    [html.H1("Your virtual phones : "), html.Div([html.Div([phone, html.P(phone.number)]) for phone in phones],
+    [html.H1("Your virtual phones : "), html.Div([html.Div([phone, html.P(phone.number)],
+                                                           className="d-flex flex-column justify-content-center align-items-center") for phone in phones],
              className="d-flex flex-row")],
     className="p-5 d-flex flex-column")
-
+#[phone, html.P(phone.number)]
 
 @app.callback(
     Output({'label': 'phone-text', 'index': MATCH}, "children"),
