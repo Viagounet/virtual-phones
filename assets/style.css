@@ -3,3 +3,7 @@
 .send-button:hover{
     cursor: pointer;
 }
+
+.phone:hover{
+    cursor: cell;
+}
