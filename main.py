@@ -5,7 +5,7 @@ from dash_iconify import DashIconify
 from flask import Flask
 
 from phone import PhoneColorPalette, Phone
-
+# https://hackersandslackers.com/plotly-dash-with-flask/
 server = Flask(__name__)
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP], server=server)
 
