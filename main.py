@@ -12,8 +12,8 @@ phones = [Phone("blue", height="80vh", number="+1 719 212 2797", id=0),
           Phone("white", height="80vh", id=3)]
 
 app.layout = dbc.Container(
-    html.Div([html.Div([phone, html.P(phone.number)]) for phone in phones],
-             className="d-flex flex-row"),
+    [html.H1("Your virtual phones : "), html.Div([html.Div([phone, html.P(phone.number)]) for phone in phones],
+             className="d-flex flex-row")],
     className="p-5 d-flex flex-column")
 
 

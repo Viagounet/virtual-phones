@@ -23,6 +23,10 @@ class PhoneColorPalette:
 class Phone(html.Div):
     def __init__(self, color, id, number="None", height="auto", width="auto", **kwargs):
         self.number = number
+        self.recipient = "TDK (+33 6 37 89 06 63)"
+        if self.number == "None":
+            self.number = "No number set"
+            self.recipient = "No contact set"
         if height != "auto" and width == "auto":
             value = float(re.sub("[^0-9]", "", height))
             measure = re.sub('[^a-zA-Z]+', '', height)
@@ -46,13 +50,14 @@ class Phone(html.Div):
             className="d-flex flex-row "
                       "align-items-center gap-2 p-3")
 
-        self.header = html.Div([], id={'label': 'phone-top', 'index': id},
+        self.header = html.Div([html.H5(self.recipient, style={"color":"black"})], id={'label': 'phone-top', 'index': id},
                                style={"width": "100%",
                                       "min-height": "10%",
                                       "position": "relative",
                                       "height": "10%", "background-color": f"{palette.top}",
                                       "borderRadius": "10px 10px 0px 0px",
-                                      "border-bottom": f"3px ridge {palette.buttons}"})
+                                      "border-bottom": f"3px ridge {palette.buttons}"},
+                               className="d-flex flex-row justify-content-center align-items-center p-2")
 
         super().__init__([  # Equivalent to `html.Div([...])`
             html.Div([
@@ -60,7 +65,9 @@ class Phone(html.Div):
                 self.header,
 
                 # Messages
-                html.Div([html.P(id={'label': 'phone-text', 'index': id}, style={"color": "black"})]),
+                html.Div([html.P(f"This is the start of your conversation with", style={"color": "black"}),
+                          html.P(id={'label': 'phone-text', 'index': id}, style={"color": "black"},
+                                 )], className="p-2"),
 
                 # Footer
                 self.footer,
