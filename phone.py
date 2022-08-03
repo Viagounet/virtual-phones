@@ -1,7 +1,7 @@
 import re
 from cgitb import html
 import dash_bootstrap_components as dbc
-from dash import html
+from dash import html, get_asset_url
 from dash_iconify import DashIconify
 
 from send_sms import send_sms_to
@@ -23,6 +23,7 @@ class PhoneColorPalette:
 
 class Phone(html.Div):
     def __init__(self, color, id, number="None", height="auto", width="auto", **kwargs):
+        self.phone_id = id
         self.number = number
         self.recipient = "TDK"
         self.messages_list = ["Yes this is a test", "and another test"]
@@ -36,7 +37,7 @@ class Phone(html.Div):
             style={"color": "black", "background-color": "white", "border-radius": "10px", "padding": "5px",
                    "border": "1px solid gray", "font-size": "0.8rem", "margin": "0.5rem"}) for message in
             self.messages_list],
-        id={'label': 'phone-text', 'index': id})
+            id={'label': 'phone-text', 'index': self.phone_id})
 
         if height != "auto" and width == "auto":
             value = float(re.sub("[^0-9]", "", height))
@@ -47,57 +48,101 @@ class Phone(html.Div):
             measure = re.sub('[^a-zA-Z]+', '', width)
             height = str(value * 2) + measure
 
-        palette = PhoneColorPalette(color)
+        self.palette = PhoneColorPalette(color)
+
+        super().__init__(
+            # All the components/screens of the phone in order to load the ids.
+            # However, only one is visible at a time.
+            children=[
+                self.messaging_screen("block"),
+                self.main_screen("none")
+            ],
+            style={'color': 'white', 'backgroundColor': f"{self.palette.bg}",
+                   "width": width, "height": height, "border": "7px gray ridge",
+                   "borderRadius": "20px", "margin": "10px", "position": "relative"},
+            className="phone",
+            id={'label': 'phone-container', 'index': self.phone_id},
+        )
+
+    def messaging_screen(self, display):
         self.footer = html.Div([
             html.Div([
-                dbc.Input(placeholder="Your text message", id={'label': 'phone-text-area', 'index': id}),
-                html.Div(DashIconify(icon="material-symbols:send-rounded", width=30, color=f"{palette.buttons}",
-                                     ), id={'label': 'send-message-phone', 'index': id}, className="send-button")
+                dbc.Input(placeholder="Your text message", id={'label': 'phone-text-area', 'index': self.phone_id}),
+                html.Div(DashIconify(icon="material-symbols:send-rounded", width=30, color=f"{self.palette.buttons}",
+                                     ), id={'label': 'send-message-phone', 'index': self.phone_id},
+                         className="send-button")
             ], className="d-flex flex-row justify-content-center align-items-center p-2 gap-2")
         ],
-            style={"width": "100%", "position": "absolute", "bottom": "0%", "background-color": f"{palette.bg}",
+            style={"width": "100%", "position": "absolute", "bottom": "0%", "background-color": f"{self.palette.bg}",
                    "borderRadius": "0px 0px 10px 10px"})
 
         self.header = html.Div(
             [
                 html.Div(
                     [html.Div(
-                        DashIconify(icon="material-symbols:contact-page", width=30, color=f"{palette.high_contrast}"),
-                        className="send-button", id={'label': 'phone-go-contact', 'index': id}),
+                        DashIconify(icon="material-symbols:contact-page", width=30,
+                                    color=f"{self.palette.high_contrast}"),
+                        className="send-button", id={'label': 'phone-go-contact', 'index': self.phone_id}),
                         html.H6(self.recipient, style={"color": "black"})],
                     className="d-flex flex-row justify-content-center align-items-center p-2 gap-2"),
             ],
 
-            id={'label': 'phone-top', 'index': id},
+            id={'label': 'phone-top', 'index': self.phone_id},
             style={"width": "100%",
                    "min-height": "10%",
                    "position": "relative",
-                   "height": "10%", "background-color": f"{palette.top}",
+                   "height": "10%", "background-color": f"{self.palette.top}",
                    "borderRadius": "10px 10px 0px 0px",
-                   "border-bottom": f"3px ridge {palette.buttons}"},
+                   "border-bottom": f"3px ridge {self.palette.buttons}"},
             className="d-flex flex-row justify-content-center align-items-center p-2")
 
-        super().__init__(
-            [html.Div([  # Equivalent to `html.Div([...])`
-                # Header
-                self.header,
+        screen = html.Div([html.Div([  # Equivalent to `html.Div([...])`
+            # Header
+            self.header,
 
-                # Messages
-                self.messages,
+            # Messages
+            self.messages,
 
-                # Footer
-            ], style={"position": "absolute", "top": "0px", "left": "0px", "bottom": "0px", "right": "0px",
-                      "overflow": "auto"}),
-                self.footer,
+            # Footer
+        ], style={"position": "absolute", "top": "0px", "left": "0px", "bottom": "0px", "right": "0px",
+                  "overflow": "auto"}),
+            self.footer,
 
-            ],
+        ], id={"type": "messaging-screen", "index": self.phone_id}, style={"display": display})
 
-            style={'color': 'white', 'backgroundColor': f"{palette.bg}",
-                   "width": width, "height": height, "border": "7px gray ridge",
-                   "borderRadius": "20px", "margin": "10px", "position": "relative"},
-            className="phone",
-            id={'label': 'phone-container', 'index': id},
-        )
+        return screen
+
+    def main_screen(self, display):
+        screen = [html.Div([  # Equivalent to `html.Div([...])`
+            # Messages
+            # Div containing an icon for contact and another icon for messages
+            html.Div(
+                [
+                    html.Title("Les iñages font chier"),
+                    html.Img(src=get_asset_url("imgs/4278162.jpg"),
+                             style={"width": "100%", "height": "100%", "position": "absolute", "top": "0px",
+                                    "left": "0px",
+                                    "border-radius": "10px", "z-index": "0"},
+                             className="d-flex flex-row justify-content-center align-items-center"
+                             ),
+                    html.Div(DashIconify(icon="bxs:contact", width=60,
+                                         color=f"{self.palette.high_contrast}"),
+                             style={"z-index": "0"},
+                             id={'label': 'phone-go-to-contact-list', 'index': self.phone_id}),
+                    html.Div(DashIconify(icon="material-symbols:mail-outline", width=60,
+                                         color=f"{self.palette.high_contrast}"),
+                             style={"z-index": "0"},
+                             id={'label': 'phone-go-to-mail', 'index': self.phone_id}),
+                ],
+                className="d-flex flex-row p-4 gap-3"
+            ),
+
+            # Footer
+        ], style={"position": "absolute", "top": "0px", "left": "0px", "bottom": "0px", "right": "0px",
+                  "overflow": "auto"}),
+
+        ]
+        return html.Div(screen, {"type": "main-screen", "index": self.phone_id}, style={"display": display})
 
     def send_sms(self, content, recipient):
         send_sms_to(content, recipient, self.number)
